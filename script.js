@@ -27,10 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
     userId = urlParams.get('userId') || 'guest-user';
     returnUrl = urlParams.get('returnUrl') || null;
     
-    // API URL - Change this to your Netlify function URL in production
+    // API URL - Use the correct Netlify functions URL structure
     const API_URL = window.location.hostname === 'localhost' 
         ? 'http://localhost:5000'
-        : 'https://your-netlify-function-url.netlify.app/.netlify/functions';
+        : 'https://survay-payment.netlify.app/.netlify/functions';
     
     // Function to format phone number for Kenyan format
     function formatPhoneNumber(input) {
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const phoneNumber = formatPhoneNumber(phoneInput.value);
             
             // Make API request to initiate payment
-            const response = await fetch(`${API_URL}/api/initiate-payment`, {
+            const response = await fetch(`${API_URL}/initiate-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         pollInterval = setInterval(async () => {
             try {
-                const response = await fetch(`${API_URL}/api/payment-status/${reference}`);
+                const response = await fetch(`${API_URL}/payment-status/${reference}`);
                 const data = await response.json();
                 
                 if (data.success && data.payment) {
