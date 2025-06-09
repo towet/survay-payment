@@ -56,11 +56,12 @@ exports.handler = async (event, context) => {
     // Define the callback URL - use Netlify function URL
     const callbackUrl = `${process.env.URL || 'https://your-netlify-site.netlify.app'}/.netlify/functions/payment-callback`;
     
-    const payload = {
+      const payload = {
       amount: amount,
       phone_number: phoneNumber,
-      channel_id: CHANNEL_ID,
-      provider: "m-pesa",
+      channel_id: CHANNEL_ID, // This is 2253
+      provider: "sasapay",     // <<< Corrected from "m-pesa"
+      network_code: "63902",   // <<< Added
       external_reference: externalReference,
       description: description,
       callback_url: callbackUrl
