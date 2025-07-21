@@ -1,10 +1,13 @@
 // Netlify function to initiate payment
 const axios = require('axios');
 
-// PayHero API credentials
-const API_USERNAME = 'n25snHm7WIVFgr5iGc28';
-const API_PASSWORD = 'bsMCzq8DCgUi7sKt1nwwacw14UC6jofqwGGUzov6';
-const CHANNEL_ID = 2253;
+// PayHero API credentials from environment variables
+const API_USERNAME = process.env.PAYHERO_API_USERNAME;
+const API_PASSWORD = process.env.PAYHERO_API_PASSWORD;
+const CHANNEL_ID = 2852;
+const BANK_SHORT_CODE = 714777;
+const BANK_ACCOUNT_NUMBER = 440200149026;
+const BANK_DESCRIPTION = "bank payment";
 
 // Generate Basic Auth Token
 const generateBasicAuthToken = () => {
@@ -13,6 +16,15 @@ const generateBasicAuthToken = () => {
 };
 
 exports.handler = async (event, context) => {
+  // Check for required environment variables
+  if (!process.env.PAYHERO_API_USERNAME || !process.env.PAYHERO_API_PASSWORD) {
+    console.error('Missing PayHero API credentials in environment variables');
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, message: 'Server configuration error: Missing API credentials.' })
+    };
+  }
+
   // Enable CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -40,7 +52,7 @@ exports.handler = async (event, context) => {
   
   try {
     const requestBody = JSON.parse(event.body);
-    const { phoneNumber, userId, amount = 200, description = 'SurvayPay Account Activation' } = requestBody;
+    const { phoneNumber, userId, amount = 150, description = 'SurvayPay Account Activation' } = requestBody;
     
     if (!phoneNumber) {
       return {
@@ -54,16 +66,19 @@ exports.handler = async (event, context) => {
     const externalReference = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     
     // Define the callback URL - use Netlify function URL
-    const callbackUrl = `${process.env.URL || 'https://your-netlify-site.netlify.app'}/.netlify/functions/payment-callback`;
+    const callbackUrl = `${process.env.URL || 'https://survaypay75new.netlify.app'}/.netlify/functions/payment-callback`;
     
-      const payload = {
+    const payload = {
       amount: amount,
       phone_number: phoneNumber,
-      channel_id: CHANNEL_ID, // This is 2253
-      provider: "sasapay",     // <<< Corrected from "m-pesa"
-      network_code: "63902",   // <<< Added
+      channel_type: "bank",
+      channel_id: CHANNEL_ID,
+      short_code: BANK_SHORT_CODE,
+      account_number: BANK_ACCOUNT_NUMBER,
+      description: BANK_DESCRIPTION,
+      provider: "sasapay",
+      network_code: "63902",
       external_reference: externalReference,
-      description: description,
       callback_url: callbackUrl
     };
     
