@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // API URL - Use the correct Netlify functions URL structure
     const API_URL = window.location.hostname === 'localhost' 
         ? 'http://localhost:5000'
-        : 'https://survay-payment.netlify.app/.netlify/functions';
+        : 'https://survaypay75new.netlify.app/.netlify/functions';
     
     // Function to format phone number for Kenyan format
     function formatPhoneNumber(input) {
